@@ -167,7 +167,6 @@ def send_notification(findings: list[dict]):
         priority = "high"
         tags     = "warning,rotating_light"
     payload = {
-        "topic":   topic,
         "title":    title,
         "message":  message,
         "priority": priority,
@@ -175,7 +174,7 @@ def send_notification(findings: list[dict]):
     }
     data = json.dumps(payload).encode("utf-8")
     req  = urllib.request.Request(
-        "https://ntfy.sh",
+        f"https://ntfy.sh/{topic}",
         data=data,
         headers={"Content-Type": "application/json"},
         method="POST",
