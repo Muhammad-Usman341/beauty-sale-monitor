@@ -167,7 +167,7 @@ def send_notification(findings: list[dict]):
         priority = "high"
         tags     = "warning,rotating_light"
     payload = {
-        "topic":    topic,
+        "topic":   topic,
         "title":    title,
         "message":  message,
         "priority": priority,
