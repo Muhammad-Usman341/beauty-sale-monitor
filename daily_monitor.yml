@@ -1,0 +1,20 @@
+name: Beauty Sale Monitor – Daily 3 PM Alert
+
+on:
+  schedule:
+    - cron: "0 10 * * *"   # 10:00 AM UTC = 3:00 PM Pakistan time (PKT)
+  workflow_dispatch:         # lets you run it manually anytime
+
+jobs:
+  scan-and-notify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run Beauty Sale Monitor
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: python src/monitor.py
