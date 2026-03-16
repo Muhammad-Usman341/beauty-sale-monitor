@@ -3,7 +3,7 @@ USA Beauty Retailer Sale Monitor
 Sends daily push notification to your phone via ntfy.sh (free, no signup).
 """
 
-import os, re, time, logging, urllib.request, urllib.parse, json
+import os, re, time, logging, urllib.request, urllib.parse
 from datetime import datetime
 from typing import Optional
 
@@ -150,33 +150,32 @@ def send_notification(findings: list[dict]):
     topic = NTFY_TOPIC
     today = datetime.now().strftime("%b %d")
     if not findings:
-        title    = f"✅ Beauty Monitor — {today}"
-        message  = "No sales detected today. All 17 retailers scanned. Amazon listings safe."
+        title   = f"Beauty Monitor - {today}"
+        message = "No sales today. All 17 retailers scanned. Amazon listings are SAFE."
         priority = "default"
-        tags     = "white_check_mark"
+        tags    = "white_check_mark"
     else:
         by_ret: dict[str, list] = {}
         for f in findings:
             by_ret.setdefault(f["retailer"], []).append(f)
         lines = []
         for ret, items in by_ret.items():
-            brands_str = ", ".join(f"{i['brand']} ({i['discount']})" for i in items)
-            lines.append(f"• {ret}: {brands_str}")
-        title    = f"⚠️ {len(findings)} Sale Alert(s) — {today}"
-        message  = "\n".join(lines) + "\n\nCheck Amazon pricing NOW to avoid suppression!"
+            brands_str = ", ".join(i["brand"] for i in items)
+            lines.append(f"{ret}: {brands_str}")
+        title    = f"SALE ALERT - {len(findings)} found - {today}"
+        message  = "\n".join(lines) + "\n\nCheck Amazon pricing NOW!"
         priority = "high"
-        tags     = "warning,rotating_light"
-    payload = {
-        "title":    title,
-        "message":  message,
-        "priority": priority,
-        "tags":     tags.split(","),
-    }
-    data = json.dumps(payload).encode("utf-8")
+        tags     = "warning"
+
+    data = message.encode("utf-8")
     req  = urllib.request.Request(
         f"https://ntfy.sh/{topic}",
         data=data,
-        headers={"Content-Type": "application/json"},
+        headers={
+            "Title":    title,
+            "Priority": priority,
+            "Tags":     tags,
+        },
         method="POST",
     )
     with urllib.request.urlopen(req, timeout=10) as r:
